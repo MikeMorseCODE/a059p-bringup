@@ -138,10 +138,29 @@ if [ "$with_abuild" = yes ]; then
 	[ -f "$HOME/.abuild/abuild.conf" ] || abuild-keygen -a -n -q >/dev/null 2>&1 ||
 		fail "abuild-keygen failed"
 
-	(cd "$aportdir" && abuild -r -s "$work/src" -P "$work/pkgs") >"$work/abuild.log" 2>&1 || {
+	# abuild finds a source with no URL only through SRCDEST, which it reads
+	# from its config file - passing -s/-P does not reach the fetch stage, and
+	# the build then dies in "Checking sha512sums" with the tarball missing.
+	# A scratch HOME keeps this out of the developer's own ~/.abuild.
+	buildhome=$work/home
+	mkdir -p "$buildhome/.abuild"
+	for k in "$HOME"/.abuild/*.rsa "$HOME"/.abuild/*.pub; do
+		[ -f "$k" ] && cp "$k" "$buildhome/.abuild/"
+	done
+	{
+		echo "PACKAGER=\"$PACKAGER\""
+		echo "SRCDEST=\"$work/src\""
+		echo "PKGDEST=\"$work/pkgs\""
+	} >"$buildhome/.abuild/abuild.conf"
+
+	if ! (cd "$aportdir" && HOME="$buildhome" abuild -r) >"$work/abuild.log" 2>&1; then
 		tail -n 40 "$work/abuild.log" >&2
+		echo "--- SRCDEST ---" >&2
+		ls -l "$work/src" >&2
+		echo "--- abuild config ---" >&2
+		cat "$buildhome/.abuild/abuild.conf" >&2
 		fail "abuild failed (it runs check() and package() from the APKBUILD)"
-	}
+	fi
 	apkfile=$(find "$work/pkgs" -type f -name "$pkgname-$version-r*.apk" | head -1)
 	[ -n "$apkfile" ] || fail "abuild reported success but produced no .apk"
 	ok "abuild built $(basename "$apkfile")"
