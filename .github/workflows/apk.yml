@@ -41,6 +41,7 @@ jobs:
             alpine:3.20 sh -euc "
               apk add --no-cache alpine-sdk mtools dosfstools python3 dtc make >/dev/null
               adduser -D builder
+              addgroup builder abuild
               cp -a /src /work
               chown -R builder /work
               su builder -s /bin/sh -c 'cd /work && sh ci/apk.sh --abuild'
