@@ -184,11 +184,15 @@ if [ "$with_abuild" = yes ]; then
 	# userland install that needs no network and no pmOS rootfs.
 	installroot=$work/rootfs
 	mkdir -p "$installroot"
-	apk add --root "$installroot" --initdb --no-depends --allow-untrusted "$apkfile" \
-		>"$work/apkadd.log" 2>&1 || {
-		cat "$work/apkadd.log" >&2
-		fail "apk add of the built package failed"
-	}
+	# Unpack the payload with tar rather than apk add: apk resolves the
+	# APKBUILD depends against an empty --initdb root and apk-tools 2.x has
+	# no flag to skip them, and this check is about the payload and its
+	# layout. The signature is already proven trusted, because abuild only
+	# indexed the package once its key was installed in /etc/apk/keys.
+	(cd "$installroot" && tar -xzf "$apkfile" \
+		--exclude='./.PKGINFO' --exclude='./.SIGN.*' \
+		--exclude='./.pre-*' --exclude='./.post-*') ||
+		fail "unpacking the built .apk failed"
 	for t in check-payload assemble-unixnu-payload build-initramfs inject-boot-dump \
 		diagnose-boot ufs-layout rootfs-plan; do
 		[ -x "$installroot/usr/bin/asteroids-$t" ] ||
