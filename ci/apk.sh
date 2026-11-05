@@ -133,6 +133,10 @@ if [ "$with_abuild" = yes ]; then
 	aportdir=$work/aport/$pkgname
 	mkdir -p "$aportdir" "$work/src" "$work/pkgs"
 	cp "$aport" "$aportdir/APKBUILD"
+	# A source with no URL is copied into $srcdir by abuild from the aport
+	# directory itself; SRCDEST is not consulted for it. Keep it in both
+	# places so either lookup works.
+	cp "$tarball" "$aportdir/"
 	cp "$tarball" "$work/src/"
 
 	[ -f "$HOME/.abuild/abuild.conf" ] || abuild-keygen -a -n -q >/dev/null 2>&1 ||
