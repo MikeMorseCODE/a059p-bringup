@@ -133,6 +133,9 @@ if [ "$with_abuild" = yes ]; then
 	aportdir=$work/aport/$pkgname
 	mkdir -p "$aportdir" "$work/src" "$work/pkgs"
 	cp "$aport" "$aportdir/APKBUILD"
+	# For a local source=tar.gz, abuild reads from the APKBUILD directory
+	# (startdir), not SRCDEST; keep a copy beside the APKBUILD.
+	cp "$tarball" "$aportdir/"
 	cp "$tarball" "$work/src/"
 
 	[ -f "$HOME/.abuild/abuild.conf" ] || abuild-keygen -a -n -q >/dev/null 2>&1 ||
