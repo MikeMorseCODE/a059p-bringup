@@ -133,6 +133,9 @@ if [ "$with_abuild" = yes ]; then
 	aportdir=$work/aport/$pkgname
 	mkdir -p "$aportdir" "$work/src" "$work/pkgs"
 	cp "$aport" "$aportdir/APKBUILD"
+	# For a local source=tar.gz, abuild reads from the APKBUILD directory
+	# (startdir), not SRCDEST; keep a copy beside the APKBUILD.
+	cp "$tarball" "$aportdir/"
 	cp "$tarball" "$work/src/"
 
 	[ -f "$HOME/.abuild/abuild.conf" ] || abuild-keygen -a -n -q >/dev/null 2>&1 ||
@@ -168,8 +171,12 @@ if [ "$with_abuild" = yes ]; then
 	# Install it into an empty root: this is the closest thing to a real
 	# userland install that needs no network and no pmOS rootfs.
 	installroot=$work/rootfs
-	mkdir -p "$installroot"
-	apk add --root "$installroot" --initdb --no-depends --allow-untrusted "$apkfile" \
+	mkdir -p "$installroot/etc/apk/keys"
+	# A fresh Alpine root needs repositories and keys to resolve this aport's
+	# real dependencies. We only compare this package's own installed paths.
+	cp /etc/apk/repositories "$installroot/etc/apk/repositories"
+	cp /etc/apk/keys/*.pub "$installroot/etc/apk/keys/"
+	apk add --root "$installroot" --initdb --no-scripts --allow-untrusted "$apkfile" \
 		>"$work/apkadd.log" 2>&1 || {
 		cat "$work/apkadd.log" >&2
 		fail "apk add of the built package failed"
@@ -196,7 +203,10 @@ if [ "$with_abuild" = yes ]; then
 	# Packaging must not quietly change the layout people get from make install.
 	make -s install DESTDIR="$work/install" PREFIX=/usr >/dev/null ||
 		fail "make install failed"
-	(cd "$installroot" && find . -type f | sort) >"$work/apk.files"
+	(cd "$installroot" && {
+		find ./usr/share/asteroids-port -type f
+		find ./usr/bin -maxdepth 1 -type f -name 'asteroids-*'
+	} | sort) >"$work/apk.files"
 	(cd "$work/install" && find . -type f | sort) >"$work/install.files"
 	if ! diff -u "$work/install.files" "$work/apk.files"; then
 		fail ".apk file list differs from make install"

@@ -44,5 +44,9 @@ jobs:
               addgroup builder abuild
               cp -a /src /work
               chown -R builder /work
+              # The CI signing key is ephemeral; apk needs its public key to
+              # trust the generated package while abuild creates the index.
+              su builder -s /bin/sh -c 'abuild-keygen -a -n -q'
+              cp /home/builder/.abuild/*.rsa.pub /etc/apk/keys/
               su builder -s /bin/sh -c 'cd /work && sh ci/apk.sh --abuild'
             "
