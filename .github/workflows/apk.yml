@@ -42,6 +42,8 @@ jobs:
               apk add --no-cache alpine-sdk mtools dosfstools python3 dtc make >/dev/null
               adduser -D builder
               addgroup builder abuild
+              su builder -s /bin/sh -c 'abuild-keygen -a -n -q'
+              cp /home/builder/.abuild/*.pub /etc/apk/keys/
               cp -a /src /work
               chown -R builder /work
               su builder -s /bin/sh -c 'cd /work && sh ci/apk.sh --abuild'

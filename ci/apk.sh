@@ -204,7 +204,9 @@ if [ "$with_abuild" = yes ]; then
 	# Packaging must not quietly change the layout people get from make install.
 	make -s install DESTDIR="$work/install" PREFIX=/usr >/dev/null ||
 		fail "make install failed"
-	(cd "$installroot" && find . -type f | sort) >"$work/apk.files"
+	# apk keeps its own database under /lib/apk; compare only packaged files.
+	(cd "$installroot" && find . -type f \
+		! -path './lib/apk/*' ! -path './etc/apk/*' | sort) >"$work/apk.files"
 	(cd "$work/install" && find . -type f | sort) >"$work/install.files"
 	if ! diff -u "$work/install.files" "$work/apk.files"; then
 		fail ".apk file list differs from make install"
