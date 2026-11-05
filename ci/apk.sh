@@ -169,8 +169,15 @@ if [ "$with_abuild" = yes ]; then
 		ls -l "$buildhome/.abuild" >&2
 		fail "abuild failed (it runs check() and package() from the APKBUILD)"
 	fi
-	apkfile=$(find "$work/pkgs" -type f -name "$pkgname-$version-r*.apk" | head -1)
-	[ -n "$apkfile" ] || fail "abuild reported success but produced no .apk"
+	# abuild keeps the package in PKGDEST or moves it into the repository
+	# tree under the scratch HOME, so search the whole scratch tree.
+	apkfile=$(find "$work" -type f -name "$pkgname-$version-r*.apk" | head -1)
+	if [ -z "$apkfile" ]; then
+		echo "--- no .apk under $work ---" >&2
+		find "$work" -name '*.apk' >&2
+		tail -n 20 "$work/abuild.log" >&2
+		fail "abuild reported success but produced no .apk"
+	fi
 	ok "abuild built $(basename "$apkfile")"
 
 	# Install it into an empty root: this is the closest thing to a real
