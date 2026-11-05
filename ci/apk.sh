@@ -155,7 +155,7 @@ if [ "$with_abuild" = yes ]; then
 		[ -n "$privkey" ] || fail "no signing private key was staged in $buildhome/.abuild"
 		echo "PACKAGER_PRIVKEY=\"$privkey\""
 		echo "SRCDEST=\"$work/src\""
-		echo "PKGDEST=\"$work/pkgs\""
+		echo "REPODEST=\"$work/pkgs\""
 	} >"$buildhome/.abuild/abuild.conf"
 
 	if ! (cd "$aportdir" && HOME="$buildhome" abuild -r) >"$work/abuild.log" 2>&1; then
