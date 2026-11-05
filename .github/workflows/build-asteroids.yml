@@ -1,0 +1,111 @@
+name: Build Linux for Nothing Phone (3a) Pro (asteroids)
+
+# Replaces build-asteroids-linux-7.2.yml, which had three defects:
+#   * checked out milos-mainline/linux at milos-7.2.y from a fork that does not
+#     carry the asteroids work (your branch is milos-7.3.y)
+#   * configured with plain `defconfig`, which enables none of the Milos
+#     drivers (no SM_GCC_MILOS, no pinctrl, no interconnect, no MDSS)
+#   * referenced qcom/milos-nothing-asteroids.dtb while building a tree whose
+#     board file is milos-nothing-asteroids.dts -> the `test -s` could only
+#     pass against a different tree
+#
+# Output is a UEFI payload (kernel + DTB + optional initramfs) for Mu-Silicium
+# + systemd-boot, not an Android boot image. Add mkbootimg back only if you
+# actually intend to `fastboot boot` it.
+
+on:
+  workflow_dispatch:
+    inputs:
+      linux_ref:
+        description: "milos-mainline/linux branch, tag or commit"
+        required: true
+        default: "milos-7.3.y"
+  push:
+    branches:
+      - wip-next-20250417
+    paths:
+      - .github/workflows/build-asteroids.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: asteroids-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Check out Milos kernel
+        uses: actions/checkout@v4
+        with:
+          repository: milos-mainline/linux
+          ref: ${{ inputs.linux_ref || 'milos-7.3.y' }}
+          path: kernel
+          fetch-depth: 1
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            bc bison build-essential cpio device-tree-compiler flex \
+            libelf-dev libssl-dev clang dwarves lld llvm python3 rsync
+
+      - name: Configure for Milos
+        run: |
+          # fp6_defconfig is the SM7635 defconfig that actually enables the SoC
+          # drivers. `defconfig` does not, which is why the old image had no
+          # storage or display support.
+          make -C kernel O="$PWD/out" ARCH=arm64 LLVM=1 fp6_defconfig
+          make -C kernel O="$PWD/out" ARCH=arm64 LLVM=1 olddefconfig
+
+          # Fail loudly instead of producing a kernel that cannot boot this board.
+          # Names verified against arch/arm64/configs/fp6_defconfig in milos-7.3.y:
+          # the whole port is renamed to "milos", so SM7635-era symbol names are gone.
+          for sym in CONFIG_ARCH_QCOM CONFIG_SCSI_UFS_QCOM CONFIG_DRM_MSM \
+                     CONFIG_INTERCONNECT_QCOM_MILOS; do
+            grep -q "^$sym=y" out/.config || { echo "missing $sym in out/.config"; exit 1; }
+          done
+
+          # Anything the board needs beyond the FP6 defconfig goes here, e.g.
+          #   kernel/scripts/config --file out/.config --enable DRM_PANEL_VXN_RM69220
+          # then re-run olddefconfig.
+
+      - name: Build kernel, DTB and modules
+        run: |
+          make -C kernel O="$PWD/out" ARCH=arm64 LLVM=1 -j"$(nproc)" \
+            Image qcom/milos-nothing-asteroids.dtb modules
+          test -s out/arch/arm64/boot/Image
+          test -s out/arch/arm64/boot/dts/qcom/milos-nothing-asteroids.dtb
+
+      - name: Stage UEFI payload
+        run: |
+          mkdir -p artifacts/esp
+          cp out/arch/arm64/boot/Image              artifacts/esp/Image
+          cp out/arch/arm64/boot/dts/qcom/milos-nothing-asteroids.dtb \
+                                                    artifacts/esp/nothing-asteroids.dtb
+          cp out/.config                            artifacts/kernel.config
+          # Module staging for the rootfs payload; the kernel package handles
+          # this in pmOS, it is here so a hand-rolled rootfs can still load them.
+          make -C kernel O="$PWD/out" ARCH=arm64 LLVM=1 \
+            INSTALL_MOD_PATH="$PWD/artifacts/modules" modules_install
+          git -C kernel rev-parse HEAD > artifacts/source-commit.txt
+          {
+            echo "source=milos-mainline/linux"
+            echo "ref=${{ inputs.linux_ref || 'milos-7.3.y' }}"
+            echo "built_at=$(date -u +%FT%TZ)"
+            echo "dtb=nothing-asteroids.dtb"
+            echo "boot=UEFI (Mu-Silicium) + systemd-boot; no Android boot image"
+          } > artifacts/build-info.txt
+          (cd artifacts && sha256sum esp/Image esp/nothing-asteroids.dtb \
+             kernel.config source-commit.txt build-info.txt > SHA256SUMS)
+
+      - name: Upload payload
+        uses: actions/upload-artifact@v4
+        with:
+          name: asteroids-linux-uefi-payload
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 14

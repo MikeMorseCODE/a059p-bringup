@@ -1,0 +1,50 @@
+diff --git a/ports/a059p-pmaports/device/testing/device-nothing-asteroidspro/APKBUILD b/ports/a059p-pmaports/device/testing/device-nothing-asteroidspro/APKBUILD
+index 5a0282a..01d6196 100644
+--- a/ports/a059p-pmaports/device/testing/device-nothing-asteroidspro/APKBUILD
++++ b/ports/a059p-pmaports/device/testing/device-nothing-asteroidspro/APKBUILD
+@@ -2,7 +2,7 @@
+ # FIXME before upstreaming: maintainer and validated kernel package/deps.
+ pkgname=device-nothing-asteroidspro
+ pkgdesc="Nothing Phone (3a) Pro (A059P) experimental Nura device metadata"
+-pkgver=0
++pkgver=1
+ pkgrel=0
+ url="https://nura.eco"
+ license="MIT"
+@@ -26,6 +26,6 @@ package() {
+ }
+ 
+ sha512sums="
+-62ec9adbc3f4f8882808ea0c05fdfebc638afa7177e9ab4037d05039cf6ceb69977c3011a929c80ee9e69f1275568e6b5670e1c635f568047cd3dbf53feeebea  deviceinfo
+-80c6010201b91ebdb238d3ebb788a286bef896a50fe2b5f38b923352e2d5637dad2921a2f1f21aa929d87d903e1e5c6e63fbc7a41677d87e419554f7e5f1702e  kernel-cmdline.conf
++bf007d9fb20e24b919ad25d9dd7040c0d724b7be68ecdcc04d12e6bd130cabf641e506ce0688d8fbc234c664cf17db1368924bdfe1ad569ac0862f04a067e3c0  deviceinfo
++140c27596be9b47b0ed047a111c544259886fd4faeccbc6669e9520753c836bf35a9fbac567817d2b7e068f922619c2a39573b9881ab5942542febed71596460  kernel-cmdline.conf
+ "
+diff --git a/ports/a059p-pmaports/device/testing/device-nothing-asteroidspro/deviceinfo b/ports/a059p-pmaports/device/testing/device-nothing-asteroidspro/deviceinfo
+index 3686d91..dcdf546 100644
+--- a/ports/a059p-pmaports/device/testing/device-nothing-asteroidspro/deviceinfo
++++ b/ports/a059p-pmaports/device/testing/device-nothing-asteroidspro/deviceinfo
+@@ -17,3 +17,14 @@ deviceinfo_flash_method="none"
+ deviceinfo_generate_bootimg="false"
+ deviceinfo_flash_kernel_on_update="false"
+ deviceinfo_dev_internal_storage_repartition="false"
++
++# bring-up metadata
++deviceinfo_screen_width="1080"
++deviceinfo_screen_height="2392"
++deviceinfo_getty="ttyMSM0;115200"
++deviceinfo_rootfs_image_sector_size="4096"
++# TODO: add deviceinfo_dtb="qcom/milos-nothing-asteroids" once
++# linux-postmarketos-qcom-milos is a real dependency. The name is verified
++# against arch/arm64/boot/dts/qcom/Makefile in milos-7.3.y ("dtb-$(CONFIG_ARCH_QCOM)
++# += milos-nothing-asteroids.dtb"), NOT the sm7635-nothing-asteroids.dts this
++# 6.15-based tree carries.
+diff --git a/ports/a059p-pmaports/device/testing/device-nothing-asteroidspro/kernel-cmdline.conf b/ports/a059p-pmaports/device/testing/device-nothing-asteroidspro/kernel-cmdline.conf
+index eb23ed8..87ed49b 100644
+--- a/ports/a059p-pmaports/device/testing/device-nothing-asteroidspro/kernel-cmdline.conf
++++ b/ports/a059p-pmaports/device/testing/device-nothing-asteroidspro/kernel-cmdline.conf
+@@ -9,3 +9,4 @@ maxcpus=1
+ cpuidle.off=1
+ iommu.passthrough=0
+ nokaslr
++console=ttyMSM0,115200n8

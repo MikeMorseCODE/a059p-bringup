@@ -1,0 +1,11 @@
+== preflight ==
+== build ==
+== inject the boot failure dump ==
+  [ok]   dump in place (<bytes>)
+== verify (what switch-root and the failure path need) ==
+  [ok]   init is pmOS init.sh
+  [ok]   init_functions.sh
+  [ok]   source_deviceinfo
+  [ok]   blkid
+  [ok]   boot failure dump installed
+RESULT: initramfs has the dump; next: assemble the UniXNU payload

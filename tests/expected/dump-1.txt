@@ -1,0 +1,39 @@
+
+================ pmOS boot failure ================
+uptime: <uptime>
+model : Nothing Phone (3a) Pro
+cmdline: console=tty0 console=ttyMSM0,115200n8 pmos.debug-shell
+codename: 
+super  : 
+
+--- ufs / phy / scsi (last 20) ---
+ufshcd-qcom 1d84000.ufshc: ufshcd_pltfrm_init() done
+scsi host0: ufshcd
+
+--- last 12 kernel lines ---
+ufshcd-qcom 1d84000.ufshc: ufshcd_pltfrm_init() done
+scsi host0: ufshcd
+ sd 0:0:0:0: [sda] 488397168 4096-byte logical blocks
+
+--- /proc/partitions ---
+major minor  #blocks  name
+
+   8        0  244198584 sda
+   8        1    2097152 sda1
+   8       12  240000000 sda12
+
+--- blkid ---
+/dev/sda1: PARTLABEL="super" TYPE="none"
+/dev/sda12: LABEL="pmOS_root" UUID="abcd" TYPE="ext4"
+
+--- /dev/disk/by-partlabel ---
+total 0
+
+--- /dev/mapper ---
+total 0
+
+===================================================
+ VERDICT: pmOS_root FOUND - failure is in the mount or the rootfs itself
+ Photograph this screen; press the volume key to
+ beep, then attach USB for the debug shell.
+===================================================

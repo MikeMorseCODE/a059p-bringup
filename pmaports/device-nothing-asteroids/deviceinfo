@@ -1,0 +1,48 @@
+# Reference: <https://postmarketos.org/deviceinfo>
+# Please use double quotes only. You can source this file in shell scripts.
+
+deviceinfo_format_version="0"
+deviceinfo_name="Nothing Phone (3a) Pro"
+deviceinfo_manufacturer="Nothing"
+deviceinfo_codename="nothing-asteroids"
+deviceinfo_year="2025"
+
+# Must match the DTB shipped by linux-postmarketos-qcom-milos, i.e. the
+# `milos-nothing-asteroids.dtb` target in arch/arm64/boot/dts/qcom/Makefile.
+# Your own fork calls this file sm7635-nothing-asteroids.dts (Danila's 6.15
+# tree); that name will not resolve against the packaged kernel.
+deviceinfo_dtb="qcom/milos-nothing-asteroids"
+deviceinfo_arch="aarch64"
+
+# Device related
+# drm=false until MDSS/DPU/DSI + panel are enabled: the verified display path
+# is the EFI framebuffer (fb0, 1080x2392, stride 4320), not msm DRM.
+deviceinfo_drm="false"
+deviceinfo_chassis="handset"
+deviceinfo_external_storage="false"
+deviceinfo_screen_width="1080"
+deviceinfo_screen_height="2392"
+# Board DTS: stdout-path = "serial0:115200n8" on uart5/Q4. Keep this; it is the
+# only debug channel that survives a bad userspace.
+deviceinfo_getty="ttyMSM0;115200"
+
+# Bootloader related
+# The current verified boot path is BootShim -> Project Silicium UEFI ->
+# UniXNU EFI payload, which postmarketOS boot-deploy does not drive yet.
+# Keep all three of these until a pmOS initramfs/rootfs is observed booting;
+# do not flip them to look installable.
+deviceinfo_flash_method="none"
+deviceinfo_generate_bootimg="false"
+deviceinfo_flash_kernel_on_update="false"
+deviceinfo_dev_internal_storage_repartition="false"
+
+# UFS storage
+deviceinfo_rootfs_image_sector_size="4096"
+
+# Rootfs / storage
+# UFS enumerates as /dev/sda. Get the real GPT from the phone first:
+#   sh ufs-layout.sh > /tmp/layout.txt      (see asteroids-port/scripts/)
+# The initramfs finds the rootfs by filesystem label "pmOS_root" and /boot by
+# "pmOS_boot", so no root= is needed once those labels are set.
+# Uncomment only if the rootfs lives inside the dynamic super partition:
+#deviceinfo_super_partitions="/dev/sda11"

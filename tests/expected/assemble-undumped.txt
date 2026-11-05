@@ -1,0 +1,9 @@
+assemble-unixnu-payload: WARNING: initramfs has no boot failure dump.
+  A failed boot will show only the splash error, with nothing on the
+  framebuffer to photograph. Rebuild it with build-initramfs.sh, which
+  injects the dump, or run scripts/inject-boot-dump.sh manually.
+wrote <tmp> (64 MiB FAT16)
+kernel : Payloads/linux.efi
+dtb    : Payloads/board.dtb
+initrd : Payloads/initramfs
+args   : console=tty0 console=ttyMSM0,115200n8 pmos.debug-shell

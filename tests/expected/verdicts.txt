@@ -1,0 +1,4 @@
+ VERDICT: pmOS_root FOUND - failure is in the mount or the rootfs itself
+ VERDICT: DISK AND PARTITIONS OK, NO pmOS_root LABEL - format with -L pmOS_root
+ VERDICT: UFS DRIVER NEVER BOUND - check &ufs_mem_hc and CONFIG_SCSI_UFS_QCOM
+ VERDICT: DISK sda HAS NO PARTITIONS - GPT not parsed or table missing

@@ -1,0 +1,37 @@
+diff --git a/arch/arm64/boot/dts/qcom/milos-nothing-asteroids.dts b/arch/arm64/boot/dts/qcom/milos-nothing-asteroids.dts
+index 787acef4..be8d9f30 100644
+--- a/arch/arm64/boot/dts/qcom/milos-nothing-asteroids.dts
++++ b/arch/arm64/boot/dts/qcom/milos-nothing-asteroids.dts
+@@ -905,6 +905,32 @@ &uart5 {
+ 	status = "okay";
+ };
+ 
++&ufs_mem_hc {
++	/*
++	 * No reset-gpios: the downstream A059P device tree does not model a
++	 * UFS reset line on the TLMM either, so nothing is driven here.
++	 */
++	vcc-supply = <&vreg_l12b>;
++
++	/* 1p8 rail. Downstream maps L4F to vccq2 with 0xb71b0 = 750 mA. */
++	vccq2-supply = <&vreg_l4f>;
++	vccq2-max-microamp = <750000>;
++
++	status = "okay";
++};
++
++&ufs_mem_phy {
++	/*
++	 * Downstream feeds vdda-phy and vdda-qref from L2B and vdda-pll from
++	 * L4B. Only vdda-phy/vdda-pll are known to this kernel's QMP UFS phy,
++	 * so the qref rail is left implicit.
++	 */
++	vdda-phy-supply = <&vreg_l2b>;
++	vdda-pll-supply = <&vreg_l4b>;
++
++	status = "okay";
++};
++
+ &usb_1 {
+ 	/* USB 2.0 only, HW does not support USB 3.x */
+ 	qcom,select-utmi-as-pipe-clk;

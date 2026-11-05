@@ -1,0 +1,4 @@
+#!/bin/busybox sh
+# Fixture: a plain BusyBox initramfs. It boots to a shell and never reaches
+# mount_root_partition, which is exactly what the checker has to reject.
+exec /bin/sh

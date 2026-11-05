@@ -1,0 +1,10 @@
+# Kernel modules (names, no .ko suffix) that must be present in the initramfs.
+#
+# Empty on purpose right now: the verified boot path uses the EFI framebuffer
+# and a serial/ACM console, neither of which needs a module in the initramfs.
+#
+# When DRM + touch land, the panel driver is built as a module in the kernel
+# config, so it has to appear here or the display never comes up during boot:
+#
+#panel-vxn-rm69220
+#spi-geni-qcom

@@ -1,0 +1,40 @@
+# Reference: <https://postmarketos.org/devicepkg>
+# FIXME before any merge request: pmaports requires a real maintainer line.
+maintainer="First Last <you@example.org>"
+pkgname=device-nothing-asteroids
+pkgdesc="Nothing Phone (3a) / (3a) Pro"
+pkgver=1
+pkgrel=0
+url="https://postmarketos.org"
+license="MIT"
+arch="aarch64"
+options="!check !archcheck"
+depends="
+	linux-postmarketos-qcom-milos
+	make-dynpart-mappings
+	postmarketos-base
+	soc-qcom
+	soc-qcom-qbootctl
+	systemd-boot
+"
+makedepends="devicepkg-dev"
+source="
+	deviceinfo
+	kernel-cmdline.conf
+	modules-initfs
+	"
+subpackages="$pkgname-systemd"
+
+build() {
+	devicepkg_build "$startdir" "$pkgname"
+}
+
+package() {
+	devicepkg_package "$startdir" "$pkgname"
+}
+
+sha512sums="
+0189301f77d6c165a12ff476e4a7654aa9737046aa4b6480eca287bc2bee3e1350de9182070bec3e5f2d6cc20e27b1f28e37f131861f32f8224b353a45605548  deviceinfo
+e6663facffcdbe924c0ea98be0db943c0cfb313b1e7958c9a1c64ec57cf8ca26caaf240692907d63f90c8e90fd0e33bb93f789d7aa30029c61c809255069f055  kernel-cmdline.conf
+d349dae3797905fac2cf9ebe01d9feee519a01b54fe38753855b64962be9a14fbcbfbdbbd6d9d33e4e1239da676ed0f76266a72642dc92095ac005e68b73da92  modules-initfs
+"

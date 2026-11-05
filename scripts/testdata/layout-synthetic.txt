@@ -1,0 +1,17 @@
+# Synthetic fixture for testing rootfs-plan.sh. Not a real device dump:
+# the exact Nothing 3a Pro GPT is still unknown until ufs-layout.sh runs on
+# hardware. Numbers are plausible for a 256 GiB UFS 3.1 device.
+disk=/dev/sda sectors=488397168 logical_block=4096 physical_block=4096 rotational=0 model=[UFS 3.1 256GB]
+  lp_metadata=yes
+  part=/dev/sda1 start=6 sectors=1024 fstype=none label=none partlabel=frp uuid=none
+  part=/dev/sda2 start=1030 sectors=2048 fstype=none label=none partlabel=vm-bootsys uuid=none
+  part=/dev/sda3 start=3078 sectors=16384 fstype=none label=none partlabel=devinfo uuid=none
+  part=/dev/sda4 start=19462 sectors=262144 fstype=none label=none partlabel=metadata uuid=none
+  part=/dev/sda5 start=281606 sectors=524288 fstype=none label=none partlabel=boot_a uuid=none
+  part=/dev/sda6 start=805894 sectors=524288 fstype=none label=none partlabel=boot_b uuid=none
+  part=/dev/sda7 start=1330182 sectors=4096 fstype=none label=none partlabel=dtbo_a uuid=none
+  part=/dev/sda8 start=1334278 sectors=4096 fstype=none label=none partlabel=dtbo_b uuid=none
+  part=/dev/sda9 start=1338374 sectors=16384 fstype=none label=none partlabel=vbmeta_a uuid=none
+  part=/dev/sda10 start=1354758 sectors=16384 fstype=none label=none partlabel=vbmeta_b uuid=none
+  part=/dev/sda11 start=1371142 sectors=2097152 fstype=none label=none partlabel=super uuid=none
+  part=/dev/sda12 start=3468294 sectors=480000000 fstype=ext4 label=none partlabel=userdata uuid=0b1d3f2e-1111-4222-8333-944455556666

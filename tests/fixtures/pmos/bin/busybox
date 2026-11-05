@@ -1,0 +1,3 @@
+#!/bin/sh
+# Fixture placeholder; the pipeline only checks that busybox is present.
+exit 0

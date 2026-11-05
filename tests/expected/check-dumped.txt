@@ -1,0 +1,28 @@
+== volume ==
+== unixnu.toml ==
+  [ok]   EFI/UniXNU/unixnu.toml present
+  [ok]   linux entry found
+  [info] kernel : Payloads/linux.efi
+  [info] initrd : Payloads/initramfs
+  [info] args   : console=tty0 console=ttyMSM0,115200n8 pmos.debug-shell
+  [info] dtb    : Payloads/board.dtb
+== kernel ==
+  [ok]   ELF
+  [ok]   aarch64
+  [info] no EFI metadata visible; confirm CONFIG_EFI_STUB=y
+== dtb ==
+  [ok]   Payloads/board.dtb has FDT magic
+  [info] Payloads/board.dtb is <bytes>
+== initramfs ==
+  [info] Payloads/initramfs is <bytes>
+  [ok]   init is postmarketOS init.sh
+  [ok]   init_functions.sh
+  [ok]   boot failure dump injected (partitions, blkid, ufs -> framebuffer)
+  [ok]   init_2nd.sh
+  [ok]   source_deviceinfo
+  [ok]   busybox
+  [ok]   blkid (rootfs label lookup)
+== boot args ==
+  [info] debug shell enabled
+  [ok]   a console= is set
+RESULT: payload is coherent; switch-root then depends on the rootfs being found

@@ -1,0 +1,3 @@
+#!/bin/sh
+# Fixture placeholder; the pipeline only checks that blkid is present.
+exit 0

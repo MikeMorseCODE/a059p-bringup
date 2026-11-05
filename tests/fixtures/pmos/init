@@ -1,0 +1,7 @@
+#!/bin/busybox ash
+# Fixture: minimal stand-in for postmarketOS /init. Only the markers our tools
+# look for need to be here; this is test data, not a working init.
+set -a
+. ./init_functions.sh
+echo "  ❬❬ PMOS STAGE 1 ❭❭"
+echo "initramfs version: fixture"
