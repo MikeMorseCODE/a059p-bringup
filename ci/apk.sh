@@ -189,10 +189,11 @@ if [ "$with_abuild" = yes ]; then
 	# no flag to skip them, and this check is about the payload and its
 	# layout. The signature is already proven trusted, because abuild only
 	# indexed the package once its key was installed in /etc/apk/keys.
-	(cd "$installroot" && tar -xzf "$apkfile" \
-		--exclude='./.PKGINFO' --exclude='./.SIGN.*' \
-		--exclude='./.pre-*' --exclude='./.post-*') ||
+	(cd "$installroot" && tar -xzf "$apkfile") ||
 		fail "unpacking the built .apk failed"
+	# Drop abuild's control entries; only the payload is compared below.
+	rm -f "$installroot/.PKGINFO" "$installroot"/.SIGN.* \
+		"$installroot"/.pre-* "$installroot"/.post-*
 	for t in check-payload assemble-unixnu-payload build-initramfs inject-boot-dump \
 		diagnose-boot ufs-layout rootfs-plan; do
 		[ -x "$installroot/usr/bin/asteroids-$t" ] ||
